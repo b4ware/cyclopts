@@ -464,7 +464,17 @@ def create_bound_arguments(
 
         for iparam in command.iparams:
             if _is_required(iparam) and iparam.name not in bound.arguments:
-                raise MissingArgumentError(parameter=iparam)
+                ## rich prompt for desired value, re-call self with new args.
+                try:
+                    from rich.prompt import Prompt
+                    choice = Prompt.ask(f"[red]C-c[/red] or specify [blue]{iparam}[/blue]")
+                    tokens.append(f"--{iparam.name}={choice}")
+                    print(f"retrying with {tokens=}")
+                    return create_bound_arguments(command, tokens, configs)
+                except KeyboardInterrupt:
+                    raise MissingArgumentError(parameter=iparam)
+                except:
+                    raise
 
     except CycloptsError as e:
         e.target = command.command
