@@ -469,12 +469,11 @@ def create_bound_arguments(
                     from rich.prompt import Prompt
                     choice = Prompt.ask(f"[red]C-c[/red] or specify [blue]{iparam}[/blue]")
                     tokens.append(f"--{iparam.name}={choice}")
-                    print(f"retrying with {tokens=}")
+                    # print(f"retrying with {tokens=}")
                     return create_bound_arguments(command, tokens, configs)
                 except KeyboardInterrupt:
+                    print() # flush
                     raise MissingArgumentError(parameter=iparam)
-                except:
-                    raise
 
     except CycloptsError as e:
         e.target = command.command
