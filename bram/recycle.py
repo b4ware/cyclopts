@@ -1,13 +1,10 @@
-import cyclopts
 from typing import Literal
-from rich import print, inspect
-import rich.traceback
 import functools
-from cyclopts.exceptions import ValidationError
 from contextvars import ContextVar
 
-APP = ContextVar('APP', default=cyclopts.App())
+import cyclopts
 
+APP = ContextVar('APP', default=cyclopts.App())
 
 def recycle(func, app: cyclopts.App = APP.get()):
     """
@@ -21,12 +18,12 @@ def recycle(func, app: cyclopts.App = APP.get()):
     app.command(func)
     @functools.wraps(func)
     def wrapper(*args, **kwargs):
-        ## MAYDO: shlex.split
+        ## MAYDO: shlex.split, since/but cyclopt does that
         strargs = ' '.join(args) + ' '
         for key, value in kwargs.items():
             strargs += f"--{key}={value} "
         fake_cli_args = f"{func.__name__} {strargs}"
-        print(f"{fake_cli_args=}")
+        # print(f"{fake_cli_args=}")
         return app(fake_cli_args)
     return wrapper
 
@@ -34,23 +31,27 @@ def recycle(func, app: cyclopts.App = APP.get()):
 
 
 if __name__ == "__main__":
+    from rich import print, inspect
+    import rich.traceback
     rich.traceback.install(show_locals=True)
 
     @recycle
     def hi(name: str, whatever=42, nobody=False) -> str:
-        return f"hello {name} {whatever=} {nobody=}"
+        return f"hello {name}!! {locals()=}"
 
     @recycle
-    def bye(x, a=2, b=42):
-        return "bye!!"
+    def bye(name: str, a:str=2, b=42):
+        return f"bye {name}!! {locals()=}"
 
-    app = APP.get()
+    app = APP.get() # can be below the above :)
+
+
     @app.command
     def native():
         return "hi world"
     
     @recycle
-    def default(value: Literal["foo", "bar", 3]):
+    def literal(value: Literal["foo", "bar", 3]):
         print(f"{value=} {type(value)=}")
 
     result = app()
