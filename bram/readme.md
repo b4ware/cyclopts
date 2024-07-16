@@ -8,11 +8,13 @@ python ./bram/recycle.py
 Where I have a rich.prompt thing:
 
 - [x] `MissingArgumentError` 
-  - [x] `create_bound_arguments()` -- python ./bram/recycle.py literal
-    - [ ] Get rid of whole function re-calls
-    - [ ] Offer infinite retries
+    - [x] `create_bound_arguments()` -- python ./bram/recycle.py literal
+        - [ ] Get rid of whole function re-calls
+        - [ ] Offer infinite retries
 - [ ] `ValidationError`
+  - Breadcrumb: `bind._convert`
 - [ ] `CoercionError`
+  - [x] `_convert` -- python ./bram/recycle.py literal 42
 
 What then?
 
@@ -20,5 +22,6 @@ What then?
 - [ ] Do calls deeper into the library (if I'm slowing things down)
 - [ ] Make a recycled FastAPI demo (or similar, I want to think of a way to support multiple kinds of output). 
 - [ ] Why not `textual` > `rich`?
-  - It's a totally unnecessary over complication, my whole point is that a certain kind of TUI and CLI are kind of interchangeable.
-  - Does textual e.g. work over ssh?
+    - It's a totally unnecessary over complication.
+    - It doesn't map at all as nice onto CLIs as most TUIs.
+    - But it does work over ssh and is probably way nicer to use??

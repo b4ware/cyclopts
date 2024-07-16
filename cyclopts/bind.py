@@ -321,6 +321,17 @@ def _convert(command: ResolvedCommand, mapping: ParameterDict) -> ParameterDict:
                         validator(type_, val)
                     coerced[iparam] = val
             except CoercionError as e:
+                ## rich prompt for desired value, re-call self with new args.
+                try:
+                    from rich.prompt import Prompt
+                    print(e)
+                    choice = Prompt.ask(f"[red]C-c[/red] or specify [blue]{iparam}[/blue]")
+                    mapping[iparam] = choice
+                    # print(f"retrying with {mapping=}")
+                    return _convert(command, mapping)
+                except KeyboardInterrupt:
+                    print() # flush
+
                 e.parameter = iparam
                 raise
             except (AssertionError, ValueError, TypeError) as e:
@@ -467,7 +478,7 @@ def create_bound_arguments(
                 ## rich prompt for desired value, re-call self with new args.
                 try:
                     from rich.prompt import Prompt
-                    choice = Prompt.ask(f"[red]C-c[/red] or specify [blue]{iparam}[/blue]")
+                    choice = Prompt.ask(f"Missing parameter. [red]C-c[/red] or specify [blue]{iparam}[/blue]")
                     tokens.append(f"--{iparam.name}={choice}")
                     # print(f"retrying with {tokens=}")
                     return create_bound_arguments(command, tokens, configs)
