@@ -12,7 +12,6 @@ Where I have a rich.prompt thing:
         - [ ] Get rid of whole function re-calls
         - [ ] Offer infinite retries
 - [ ] `ValidationError`
-  - Breadcrumb: `bind._convert`
 - [ ] `CoercionError`
   - [x] `_convert` -- python ./bram/recycle.py literal 42
 

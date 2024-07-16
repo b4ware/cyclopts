@@ -320,22 +320,30 @@ def _convert(command: ResolvedCommand, mapping: ParameterDict) -> ParameterDict:
                     for validator in cparam.validator:
                         validator(type_, val)
                     coerced[iparam] = val
-            except CoercionError as e:
-                ## rich prompt for desired value, re-call self with new args.
+            except BaseException as e:
                 try:
-                    from rich.prompt import Prompt
-                    print(e)
-                    choice = Prompt.ask(f"[red]C-c[/red] or specify [blue]{iparam}[/blue]")
-                    mapping[iparam] = choice
-                    # print(f"retrying with {mapping=}")
-                    return _convert(command, mapping)
-                except KeyboardInterrupt:
-                    print() # flush
+                    ## NOTE: this dubious nested try stuff may not even be wanted.
+                    ## Previous commit: fc01e6400c149947984ef3ffc0b1eaa8c1f52864
+                    ## I don't know whether you'd want to prompt before *every* 
+                    ## of the non-CoercionError but caught exceptions below.
+                    
+                    ## Prompt for next value to try. If given, re-call self with new args.
+                    try:
+                        from rich.prompt import Prompt
+                        print(e)
+                        choice = Prompt.ask(f"[red]C-c[/red] or specify [blue]{iparam}[/blue]")
+                        mapping[iparam] = choice
+                        # print(f"retrying with {mapping=}")
+                        return _convert(command, mapping)
+                    except KeyboardInterrupt:
+                        print() # flush
 
-                e.parameter = iparam
-                raise
-            except (AssertionError, ValueError, TypeError) as e:
-                raise ValidationError(value=e.args[0] if e.args else "", parameter=iparam) from e
+                    raise e
+                except CoercionError as e:
+                    e.parameter = iparam
+                    raise
+                except (AssertionError, ValueError, TypeError) as e:
+                    raise ValidationError(value=e.args[0] if e.args else "", parameter=iparam) from e
     return coerced
 
 
@@ -475,7 +483,7 @@ def create_bound_arguments(
 
         for iparam in command.iparams:
             if _is_required(iparam) and iparam.name not in bound.arguments:
-                ## rich prompt for desired value, re-call self with new args.
+                ## Prompt for value of missing value. If given, re-call self with new args.
                 try:
                     from rich.prompt import Prompt
                     choice = Prompt.ask(f"Missing parameter. [red]C-c[/red] or specify [blue]{iparam}[/blue]")
