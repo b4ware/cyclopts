@@ -4,7 +4,7 @@ from contextvars import ContextVar
 
 import cyclopts
 
-APP = ContextVar('APP', default=cyclopts.App())
+APP = ContextVar('APP', default=cyclopts.App()) # probably no better than a global
 
 def recycle(func, app: cyclopts.App = APP.get()):
     """

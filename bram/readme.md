@@ -11,8 +11,7 @@ Where I have a rich.prompt thing:
     - [x] `create_bound_arguments()` -- python ./bram/recycle.py literal
         - [ ] Get rid of whole function re-calls
         - [ ] Offer infinite retries
-- [ ] `ValidationError`
-- [ ] `CoercionError`
+- [ ] `ValidationError` and the like
   - [x] `_convert` -- python ./bram/recycle.py literal 42
 
 What then?

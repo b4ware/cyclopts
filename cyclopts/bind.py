@@ -331,6 +331,8 @@ def _convert(command: ResolvedCommand, mapping: ParameterDict) -> ParameterDict:
                     try:
                         from rich.prompt import Prompt
                         print(e)
+                        from rich import inspect
+                        inspect(command)
                         choice = Prompt.ask(f"[red]C-c[/red] or specify [blue]{iparam}[/blue]")
                         mapping[iparam] = choice
                         # print(f"retrying with {mapping=}")
@@ -486,6 +488,8 @@ def create_bound_arguments(
                 ## Prompt for value of missing value. If given, re-call self with new args.
                 try:
                     from rich.prompt import Prompt
+                    from rich import inspect
+                    inspect(command)
                     choice = Prompt.ask(f"Missing parameter. [red]C-c[/red] or specify [blue]{iparam}[/blue]")
                     tokens.append(f"--{iparam.name}={choice}")
                     # print(f"retrying with {tokens=}")
